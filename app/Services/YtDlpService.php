@@ -105,7 +105,7 @@ class YtDlpService
     public function getInfo(string $url): array
     {
         $args = array_merge(
-            ['yt-dlp', '--dump-json', '--no-playlist', '--no-warnings'],
+            [base_path('bin/yt-dlp'), '--dump-json', '--no-playlist', '--no-warnings'],
             $this->ffmpegArgs(),
             [$url]
         );
@@ -230,23 +230,24 @@ class YtDlpService
         $hasFfmpeg = $this->checkFfmpeg();
         $ffmpeg = $this->ffmpegArgs();
 
+        $binary = base_path('bin/yt-dlp');
         if ($type === 'audio') {
             if ($hasFfmpeg) {
-                $args = array_merge(['yt-dlp'], $ffmpeg, [
+                $args = array_merge([$binary], $ffmpeg, [
                     '-f', $formatId, '-x', '--audio-format', 'mp3',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = ['yt-dlp', '-f', $formatId, '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
+                $args = [$binary, '-f', $formatId, '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
             }
         } else {
             if ($hasFfmpeg) {
-                $args = array_merge(['yt-dlp'], $ffmpeg, [
+                $args = array_merge([$binary], $ffmpeg, [
                     '-f', $formatId . '+bestaudio/best', '--merge-output-format', 'mp4',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = ['yt-dlp', '-f', 'best[ext=mp4]/best', '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
+                $args = [$binary, '-f', 'best[ext=mp4]/best', '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
             }
         }
 
