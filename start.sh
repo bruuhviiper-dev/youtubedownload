@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# 1. Garante que o banco de dados existe e está atualizado
+# 1. Garante que a pasta e o banco de dados existem
+mkdir -p database
 touch database/database.sqlite
 php artisan migrate --force
 
