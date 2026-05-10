@@ -67,7 +67,7 @@ class DownloadController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Não foi possível obter informações deste vídeo. Verifique a URL.',
+                'message' => 'Erro técnico (Railway): ' . $e->getMessage(),
             ], 500);
         }
     }
