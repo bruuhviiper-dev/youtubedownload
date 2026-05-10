@@ -113,13 +113,21 @@ class YtDlpService
      */
     public function getInfo(string $url): array
     {
-        $binary = base_path('bin/yt-dlp');
+        $isWindows = PHP_OS_FAMILY === 'Windows';
+        $binaryName = $isWindows ? 'yt-dlp.exe' : 'yt-dlp';
+        $binary = base_path("bin/{$binaryName}");
         
         // Lazy Download: Se não existe ou é a versão antiga (leve), baixa a Standalone (pesada)
         if (!file_exists($binary) || filesize($binary) < 1000000) {
             Log::info('Binário yt-dlp ausente ou desatualizado. Tentando download da Versão Standalone...');
             if (!is_dir(base_path('bin'))) mkdir(base_path('bin'), 0755, true);
-            shell_exec("curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o $binary && chmod a+rx $binary");
+            
+            $downloadUrl = $isWindows 
+                ? 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe' 
+                : 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux';
+                
+            shell_exec("curl -L {$downloadUrl} -o \"{$binary}\"");
+            if (!$isWindows) shell_exec("chmod a+rx \"{$binary}\"");
         }
 
         // Diagnóstico Profundo
@@ -257,7 +265,9 @@ class YtDlpService
         $hasFfmpeg = $this->checkFfmpeg();
         $ffmpeg = $this->ffmpegArgs();
 
-        $binary = base_path('bin/yt-dlp');
+        $isWindows = PHP_OS_FAMILY === 'Windows';
+        $binaryName = $isWindows ? 'yt-dlp.exe' : 'yt-dlp';
+        $binary = base_path("bin/{$binaryName}");
         $cookies = $this->cookieArgs();
         $bypassArgs = ['--extractor-args', 'youtube:player_client=android'];
 
