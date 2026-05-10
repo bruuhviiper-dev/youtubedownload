@@ -106,11 +106,11 @@ class YtDlpService
     {
         $binary = base_path('bin/yt-dlp');
         
-        // Lazy Download: Se não existe, baixa agora!
-        if (!file_exists($binary)) {
-            Log::info('Binário yt-dlp ausente. Tentando download de emergência via PHP...');
+        // Lazy Download: Se não existe ou é a versão antiga (leve), baixa a Standalone (pesada)
+        if (!file_exists($binary) || filesize($binary) < 1000000) {
+            Log::info('Binário yt-dlp ausente ou desatualizado. Tentando download da Versão Standalone...');
             if (!is_dir(base_path('bin'))) mkdir(base_path('bin'), 0755, true);
-            shell_exec("curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o $binary && chmod a+rx $binary");
+            shell_exec("curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o $binary && chmod a+rx $binary");
         }
 
         // Diagnóstico Profundo
