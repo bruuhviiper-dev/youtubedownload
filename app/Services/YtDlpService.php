@@ -67,14 +67,23 @@ class YtDlpService
     }
 
     /**
+     * Get cookies argument if cookies.txt exists in storage/app.
+     */
+    private function cookieArgs(): array
+    {
+        $cookiePath = storage_path('app/cookies.txt');
+        if (file_exists($cookiePath)) {
+            return ['--cookies', $cookiePath];
+        }
+        return [];
+    }
+
+    /**
      * Get ffmpeg location args if ffmpeg exists in project root.
      */
     private function ffmpegArgs(): array
     {
-        $ffmpegPath = base_path('ffmpeg.exe');
-        if (file_exists($ffmpegPath)) {
-            return ['--ffmpeg-location', base_path()];
-        }
+        // In Railway/Linux, ffmpeg is usually in the PATH from Nixpacks
         return [];
     }
 
@@ -124,6 +133,7 @@ class YtDlpService
         $args = array_merge(
             [$binary, '--dump-json', '--no-playlist', '--no-warnings'],
             $this->ffmpegArgs(),
+            $this->cookieArgs(),
             [$url]
         );
 
@@ -248,23 +258,25 @@ class YtDlpService
         $ffmpeg = $this->ffmpegArgs();
 
         $binary = base_path('bin/yt-dlp');
+        $cookies = $this->cookieArgs();
+
         if ($type === 'audio') {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, [
                     '-f', $formatId, '-x', '--audio-format', 'mp3',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = [$binary, '-f', $formatId, '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
+                $args = array_merge([$binary, '-f', $formatId], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
             }
         } else {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, [
                     '-f', $formatId . '+bestaudio/best', '--merge-output-format', 'mp4',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = [$binary, '-f', 'best[ext=mp4]/best', '-o', $outputPath, '--no-playlist', '--no-warnings', $url];
+                $args = array_merge([$binary, '-f', 'best[ext=mp4]/best'], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
             }
         }
 
