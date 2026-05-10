@@ -3,6 +3,3 @@ nixPkgs = ["php82", "composer", "nodejs", "ffmpeg", "python311", "python311Packa
 
 [phases.build]
 cmds = ["composer install --no-dev --optimize-autoloader", "python3 -m pip install yt-dlp"]
-
-[start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
