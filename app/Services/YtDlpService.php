@@ -104,8 +104,19 @@ class YtDlpService
      */
     public function getInfo(string $url): array
     {
+        $binary = base_path('bin/yt-dlp');
+        
+        // Diagnóstico Profundo
+        Log::info('Diagnóstico yt-dlp', [
+            'path' => $binary,
+            'exists' => file_exists($binary),
+            'is_executable' => is_executable($binary),
+            'base_path' => base_path(),
+            'dir_content' => is_dir(base_path('bin')) ? scandir(base_path('bin')) : 'bin dir not found'
+        ]);
+
         $args = array_merge(
-            [base_path('bin/yt-dlp'), '--dump-json', '--no-playlist', '--no-warnings'],
+            [$binary, '--dump-json', '--no-playlist', '--no-warnings'],
             $this->ffmpegArgs(),
             [$url]
         );
