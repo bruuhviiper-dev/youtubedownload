@@ -139,7 +139,7 @@ class YtDlpService
         ]);
 
         $args = array_merge(
-            [$binary, '--dump-json', '--no-playlist', '--no-warnings', '--extractor-args', 'youtube:player_client=android'],
+            [$binary, '--dump-json', '--no-playlist', '--no-warnings'],
             $this->ffmpegArgs(),
             $this->cookieArgs(),
             [$url]
@@ -269,25 +269,24 @@ class YtDlpService
         $binaryName = $isWindows ? 'yt-dlp.exe' : 'yt-dlp';
         $binary = base_path("bin/{$binaryName}");
         $cookies = $this->cookieArgs();
-        $bypassArgs = ['--extractor-args', 'youtube:player_client=android'];
 
         if ($type === 'audio') {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, $cookies, $bypassArgs, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, [
                     '-f', $formatId, '-x', '--audio-format', 'mp3',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = array_merge([$binary, '-f', $formatId], $cookies, $bypassArgs, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
+                $args = array_merge([$binary, '-f', $formatId], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
             }
         } else {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, $cookies, $bypassArgs, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, [
                     '-f', $formatId . '+bestaudio/best', '--merge-output-format', 'mp4',
                     '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
                 ]);
             } else {
-                $args = array_merge([$binary, '-f', 'best[ext=mp4]/best'], $cookies, $bypassArgs, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
+                $args = array_merge([$binary, '-f', 'best[ext=mp4]/best'], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
             }
         }
 
