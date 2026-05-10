@@ -3,6 +3,7 @@
 # 1. Garante que a pasta e o banco de dados existem
 mkdir -p database
 touch database/database.sqlite
+chmod a+rx bin/yt-dlp 2>/dev/null || true
 php artisan migrate --force
 
 # 2. Liga o Lixeiro em segundo plano (Cron)
