@@ -174,3 +174,59 @@ footer { padding: 100px 0; border-top: 1px solid var(--border); text-align: cent
 .hidden { display: none !important; }
 .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Feature Cards (Responsive Horizontal Scroll) */
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 40px;
+    border-radius: 25px;
+}
+.feature-icon {
+    color: var(--accent);
+    margin-bottom: 30px;
+}
+.feature-card h4 {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+.feature-card p {
+    font-size: 17px;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 20px;
+        margin: 0 -20px;
+        padding: 0 20px 20px 20px;
+        gap: 20px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .feature-grid::-webkit-scrollbar {
+        height: 6px;
+    }
+    .feature-grid::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .feature-grid::-webkit-scrollbar-thumb {
+        background: var(--border-bright);
+        border-radius: 10px;
+    }
+    
+    .feature-card {
+        flex: 0 0 85%;
+        scroll-snap-align: center;
+        padding: 30px;
+    }
+}

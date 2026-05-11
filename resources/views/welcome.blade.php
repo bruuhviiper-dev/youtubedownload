@@ -129,20 +129,20 @@
         <h2 style="font-size:48px; margin-bottom:30px; font-weight:900; letter-spacing:-2px">{{ __('seo_title') }}</h2>
         <p style="color:var(--text-secondary); max-width:700px; font-size:22px; margin-bottom:60px">{{ __('seo_p1') }}</p>
         
-        <div class="feature-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:30px">
-            <div class="feature-card" style="background:var(--card-bg); border:1px solid var(--border); padding:40px; border-radius:25px">
-                <div style="color:var(--accent); margin-bottom:30px">
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
                     <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <h4 style="font-size:24px; font-weight:900; margin-bottom:15px">Privacidade Extrema</h4>
-                <p style="font-size:17px; color:var(--text-secondary)">Processamento anônimo e seguro. Seus dados nunca são armazenados ou compartilhados.</p>
+                <h4>Privacidade Extrema</h4>
+                <p>Processamento anônimo e seguro. Seus dados nunca são armazenados ou compartilhados.</p>
             </div>
-            <div class="feature-card" style="background:var(--card-bg); border:1px solid var(--border); padding:40px; border-radius:25px">
-                <div style="color:var(--accent); margin-bottom:30px">
+            <div class="feature-card">
+                <div class="feature-icon">
                     <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 </div>
-                <h4 style="font-size:24px; font-weight:900; margin-bottom:15px">Potência 4K</h4>
-                <p style="font-size:17px; color:var(--text-secondary)">{{ __('seo_p2') }}</p>
+                <h4>Potência 4K</h4>
+                <p>{{ __('seo_p2') }}</p>
             </div>
         </div>
     </section>
