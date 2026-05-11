@@ -67,12 +67,25 @@ class YtDlpService
     }
 
     /**
-     * Get cookies argument if cookies.txt exists in storage/app.
+     * Get cookies argument if cookies.txt exists in storage/app or YT_COOKIES is set.
      */
     private function cookieArgs(): array
     {
         $cookiePath = storage_path('app/cookies.txt');
-        if (file_exists($cookiePath)) {
+        $envCookies = env('YT_COOKIES');
+
+        if ($envCookies) {
+            // Se as cookies estão no .env, garante que o arquivo existe
+            if (!file_exists($cookiePath) || file_get_contents($cookiePath) !== $envCookies) {
+                if (!is_dir(storage_path('app'))) {
+                    mkdir(storage_path('app'), 0755, true);
+                }
+                file_put_contents($cookiePath, $envCookies);
+                \Illuminate\Support\Facades\Log::info('Cookies do YouTube carregados da variável de ambiente YT_COOKIES.');
+            }
+        }
+
+        if (file_exists($cookiePath) && filesize($cookiePath) > 0) {
             return ['--cookies', $cookiePath];
         }
         return [];
@@ -139,7 +152,14 @@ class YtDlpService
         ]);
 
         $args = array_merge(
-            [$binary, '--dump-json', '--no-playlist', '--no-warnings'],
+            [
+                $binary, 
+                '--dump-json', 
+                '--no-playlist', 
+                '--no-warnings',
+                '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                '--referer', 'https://www.google.com/',
+            ],
             $this->ffmpegArgs(),
             $this->cookieArgs(),
             [$url]
@@ -270,23 +290,30 @@ class YtDlpService
         $binary = base_path("bin/{$binaryName}");
         $cookies = $this->cookieArgs();
 
+        $extraArgs = [
+            '--no-playlist', 
+            '--no-warnings',
+            '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            '--referer', 'https://www.google.com/',
+        ];
+
         if ($type === 'audio') {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, $cookies, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, $extraArgs, [
                     '-f', $formatId, '-x', '--audio-format', 'mp3',
-                    '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
+                    '-o', $outputPath, $url,
                 ]);
             } else {
-                $args = array_merge([$binary, '-f', $formatId], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
+                $args = array_merge([$binary, '-f', $formatId], $cookies, $extraArgs, ['-o', $outputPath, $url]);
             }
         } else {
             if ($hasFfmpeg) {
-                $args = array_merge([$binary], $ffmpeg, $cookies, [
+                $args = array_merge([$binary], $ffmpeg, $cookies, $extraArgs, [
                     '-f', $formatId . '+bestaudio/best', '--merge-output-format', 'mp4',
-                    '-o', $outputPath, '--no-playlist', '--no-warnings', $url,
+                    '-o', $outputPath, $url,
                 ]);
             } else {
-                $args = array_merge([$binary, '-f', 'best[ext=mp4]/best'], $cookies, ['-o', $outputPath, '--no-playlist', '--no-warnings', $url]);
+                $args = array_merge([$binary, '-f', 'best[ext=mp4]/best'], $cookies, $extraArgs, ['-o', $outputPath, $url]);
             }
         }
 
