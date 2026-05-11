@@ -82,22 +82,22 @@
         
         <div id="formatList"></div>
 
-        <div style="padding: 40px 60px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:space-between">
-            <div style="display:flex; align-items:center; gap:25px">
-                <div style="width:50px; height:50px; background:var(--accent); border-radius:15px; display:flex; align-items:center; justify-content:center">
+        <div class="security-banner">
+            <div class="security-info">
+                <div class="security-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
-                    <div style="font-weight:900; font-size:18px">Segurança Cibernética</div>
-                    <div style="font-size:14px; color:var(--text-secondary)">Processamento anônimo e sem rastreadores.</div>
+                    <div class="security-title">Segurança Cibernética</div>
+                    <div class="security-desc">Processamento anônimo e sem rastreadores.</div>
                 </div>
             </div>
-            <button class="btn-start" style="height:45px; padding:0 25px; font-size:13px; box-shadow:none">SAIBA MAIS</button>
+            <button class="btn-start btn-small">SAIBA MAIS</button>
         </div>
     </div>
 
     <!-- Progress UI -->
-    <div id="progressCard" class="result-container hidden" style="padding:60px 80px;">
+    <div id="progressCard" class="result-container card-padded hidden">
         <h3 id="progressTitle" style="margin-bottom:40px; font-size:24px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></h3>
         
         <div class="progress-container">
@@ -113,15 +113,15 @@
     </div>
 
     <!-- Complete UI -->
-    <div id="completeCard" class="result-container hidden" style="padding:100px; text-align:center;">
-        <div style="width:100px; height:100px; background:rgba(176, 7, 89, 0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 40px; border: 3px solid var(--accent); box-shadow: 0 0 30px var(--accent-glow)">
+    <div id="completeCard" class="result-container complete-card hidden">
+        <div class="complete-icon-wrapper">
             <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h2 style="margin-bottom:20px; font-size:42px; font-weight:900">{{ __('status_completed') }}</h2>
-        <p id="completeInfo" style="color:var(--text-secondary); margin-bottom:60px; font-size:20px"></p>
-        <a class="btn-start" id="btnSave" href="#" download style="display:inline-block; text-decoration:none; line-height:70px; height:70px; padding:0 80px; font-size:22px">{{ __('button_download') }}</a>
+        <h2 class="complete-title">{{ __('status_completed') }}</h2>
+        <p id="completeInfo" class="complete-info"></p>
+        <a class="btn-start btn-large" id="btnSave" href="#" download>{{ __('button_download') }}</a>
         <br><br>
-        <button onclick="resetAll()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; text-decoration:underline; font-size:16px; font-weight:800; margin-top:20px">NOVO DOWNLOAD</button>
+        <button class="btn-reset" onclick="resetAll()">NOVO DOWNLOAD</button>
     </div>
 
     <!-- Features Section -->
@@ -273,15 +273,15 @@ function switchTab(type) {
     }
 
     container.innerHTML = filtered.map(f => `
-        <div class="format-row" style="display:flex; align-items:center; justify-content:space-between; padding:30px 60px; border-bottom:1px solid var(--border)">
-            <div style="display:flex; align-items:center; gap:25px">
-                <div class="quality-badge" style="background:rgba(176, 7, 89, 0.1); color:var(--accent); padding:5px 12px; border-radius:8px; font-size:12px; font-weight:900; border:1px solid rgba(176, 7, 89, 0.2)">${f.quality}</div>
-                <div>
-                    <div style="font-weight:900; font-size:20px; color:white">.${f.ext}</div>
-                    <div style="font-size:14px; color:var(--text-secondary); font-weight:600">${f.filesize ? formatBytes(f.filesize) : 'Variado'}</div>
+        <div class="format-row">
+            <div class="format-info-group">
+                <div class="quality-badge">${f.quality}</div>
+                <div class="format-meta">
+                    <div class="format-ext">.${f.ext}</div>
+                    <div class="format-size">${f.filesize ? formatBytes(f.filesize) : 'Variado'}</div>
                 </div>
             </div>
-            <button class="btn-start" style="height:50px; padding:0 30px; font-size:14px; box-shadow:none" onclick="startDownload('${f.format_id}', '${f.quality}', '${f.type}', '${f.label}')">
+            <button class="btn-start btn-format" onclick="startDownload('${f.format_id}', '${f.quality}', '${f.type}', '${f.label}')">
                 ${LANG.button_download}
             </button>
         </div>
