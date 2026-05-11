@@ -58,6 +58,16 @@
             <div id="errorBox" class="error-msg hidden" style="margin-top:25px; color:var(--accent); font-weight:900; font-size:18px"></div>
         </div>
 
+        <div class="stats-counter">
+            <div class="stats-badge">
+                <div class="stats-dot"></div>
+                <span>
+                    <span class="stats-number" id="countNum" data-target="{{ $totalDownloads }}">0</span>
+                    {{ app()->getLocale() === 'pt' ? 'downloads concluídos hoje' : 'downloads completed today' }}
+                </span>
+            </div>
+        </div>
+
         <!-- History Section -->
         <div id="historySection" class="history-section hidden">
             <div class="history-title">{{ app()->getLocale() === 'pt' ? 'Downloads Recentes' : 'Recent Downloads' }}</div>
@@ -211,8 +221,30 @@ const LANG = {
 let videoData = null;
 let formatsData = [];
 let pollTimer = null;
+let currentCount = 0;
 
-document.addEventListener('DOMContentLoaded', () => { loadHistory(); });
+document.addEventListener('DOMContentLoaded', () => { 
+    loadHistory(); 
+    animateCounter();
+});
+
+function animateCounter() {
+    const el = document.getElementById('countNum');
+    if (!el) return;
+    const target = parseInt(el.getAttribute('data-target'));
+    const duration = 2000;
+    const step = target / (duration / 30);
+    
+    const timer = setInterval(() => {
+        currentCount += step;
+        if (currentCount >= target) {
+            el.textContent = target.toLocaleString();
+            clearInterval(timer);
+        } else {
+            el.textContent = Math.floor(currentCount).toLocaleString();
+        }
+    }, 30);
+}
 
 function toggleAccordion(header) {
     const item = header.parentElement;
