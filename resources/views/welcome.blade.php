@@ -387,7 +387,15 @@ function addToHistory(item) {
 }
 
 function loadHistory() {
-    const history = JSON.parse(localStorage.getItem('tubelift_history') || '[]');
+    let history = JSON.parse(localStorage.getItem('tubelift_history') || '[]');
+    
+    // Clean up corrupted items from previous bug
+    const validHistory = history.filter(item => item.download_id && item.download_id !== 'undefined');
+    if (validHistory.length !== history.length) {
+        localStorage.setItem('tubelift_history', JSON.stringify(validHistory));
+        history = validHistory;
+    }
+
     const container = document.getElementById('historySection');
     const grid = document.getElementById('historyGrid');
 

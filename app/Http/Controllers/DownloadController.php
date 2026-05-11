@@ -129,7 +129,7 @@ class DownloadController extends Controller
             $download = Download::findOrFail($id);
 
             return response()->json([
-                'id' => $download->id,
+                'download_id' => $download->id,
                 'status' => $download->status,
                 'progress' => $download->progress,
                 'title' => $download->title,
