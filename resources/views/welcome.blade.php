@@ -72,24 +72,32 @@
         </div>
     </div>
 
-    <div id="progressCard" class="result-container card-padded hidden">
-        <h3 id="progressTitle" style="margin-bottom:20px; font-size:20px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></h3>
-        
-        <div class="progress-container">
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    <div id="progressCard" class="result-container hidden">
+        <div class="video-header">
+            <img id="progressThumb" class="video-thumb-large" src="" alt="Thumb">
+            <div class="video-meta">
+                <h3 id="progressTitle" style="font-size:18px; font-weight:700; line-height:1.4; color:var(--text-main); margin:0;"></h3>
+                <div style="font-size:14px; color:var(--accent); margin-top:5px; font-weight:600;">Preparando download...</div>
             </div>
         </div>
+        
+        <div class="card-padded" style="padding-top: 20px;">
+            <div class="progress-container">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
 
-        <div class="progress-stats">
-            <span id="progressStatus">{{ __('status_pending') }}</span>
-            <span id="progressPercent">0%</span>
-        </div>
+            <div class="progress-stats">
+                <span id="progressStatus">{{ __('status_pending') }}</span>
+                <span id="progressPercent">0%</span>
+            </div>
 
-        <!-- Exemplo: Local para Banner enquanto carrega -->
-        <div class="ad-placeholder" style="margin-top: 30px;">
-            [Espaço para Oferta Focada]
-            <span>Ex: "Enquanto seu vídeo baixa, ganhe R$50 de bônus na Plataforma X"</span>
+            <!-- Exemplo: Local para Banner enquanto carrega -->
+            <div class="ad-placeholder" style="margin-top: 30px;">
+                [Espaço para Oferta Focada]
+                <span>Ex: "Enquanto seu vídeo baixa, ganhe R$50 de bônus na Plataforma X"</span>
+            </div>
         </div>
     </div>
 
@@ -294,6 +302,7 @@ async function startDownload(formatId, quality, type, label) {
     hide('resultCard');
     show('progressCard');
     document.getElementById('progressTitle').textContent = videoData.title;
+    document.getElementById('progressThumb').src = videoData.thumbnail || '';
     document.getElementById('progressPercent').textContent = '0%';
     document.getElementById('progressFill').style.width = '0%';
     
