@@ -54,9 +54,9 @@
         <div id="formatList" class="format-list-container"></div>
 
         <!-- Exemplo: Local ideal para Banner Nativo (Adsterra) -->
-        <div class="ad-placeholder">
-            [Espaço para Banner de Afiliado]
-            <span>Ex: "Navegue sem restrições com a VPN XYZ - Baixar Agora"</span>
+        <div class="ad-placeholder" style="padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
+            <span style="margin-bottom: 10px;">Exemplo de Banner Nativo: VPN</span>
         </div>
 
         <div class="security-banner">
@@ -94,9 +94,9 @@
             </div>
 
             <!-- Exemplo: Local para Banner enquanto carrega -->
-            <div class="ad-placeholder" style="margin-top: 30px;">
-                [Espaço para Oferta Focada]
-                <span>Ex: "Enquanto seu vídeo baixa, ganhe R$50 de bônus na Plataforma X"</span>
+            <div class="ad-placeholder" style="margin-top: 30px; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
+                <img src="/bet_banner_mockup_1778793881798.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/bet', '_blank')">
+                <span style="margin-bottom: 10px;">Exemplo de Banner de Aposta (Bet)</span>
             </div>
         </div>
     </div>
@@ -108,6 +108,13 @@
         <h2 class="complete-title">{{ __('status_completed') }}</h2>
         <p id="completeInfo" class="complete-info"></p>
         <a class="btn-large" id="btnSave" href="#" download>{{ __('button_download') }}</a>
+        
+        <!-- Exemplo: Banner Final na Conclusão -->
+        <div class="ad-placeholder" style="margin: 20px auto; max-width: 500px; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
+            <span>Ganhe 3 meses grátis de VPN ao baixar hoje!</span>
+        </div>
+
         <br>
         <button class="btn-reset" onclick="resetAll()">Fazer Novo Download</button>
     </div>
