@@ -147,7 +147,6 @@ class YtDlpService
                 '--dump-json', 
                 '--no-playlist', 
                 '--no-warnings',
-                '--extractor-args', 'youtube:player_client=android,ios,web',
             ],
             $this->ffmpegArgs(),
             $this->cookieArgs(),
@@ -278,7 +277,6 @@ class YtDlpService
         $extraArgs = [
             '--no-playlist', 
             '--no-warnings',
-            '--extractor-args', 'youtube:player_client=android,ios,web',
         ];
 
         if ($type === 'audio') {
