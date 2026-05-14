@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container">
+    <style>
+        .ad-placeholder { background: var(--bg-hover); border: 2px dashed var(--border); border-radius: var(--radius); padding: 15px; text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 600; margin: 20px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; }
+        .ad-placeholder span { font-size: 12px; opacity: 0.7; font-weight: 400; margin-top: 5px; color: var(--accent); }
+    </style>
     <section class="hero">
         <h1>{{ __('title') }}</h1>
         <p>{{ __('subtitle') }}</p>
@@ -49,6 +53,12 @@
         
         <div id="formatList" class="format-list-container"></div>
 
+        <!-- Exemplo: Local ideal para Banner Nativo (Adsterra) -->
+        <div class="ad-placeholder">
+            [Espaço para Banner de Afiliado]
+            <span>Ex: "Navegue sem restrições com a VPN XYZ - Baixar Agora"</span>
+        </div>
+
         <div class="security-banner">
             <div class="security-info">
                 <div class="security-icon">
@@ -74,6 +84,12 @@
         <div class="progress-stats">
             <span id="progressStatus">{{ __('status_pending') }}</span>
             <span id="progressPercent">0%</span>
+        </div>
+
+        <!-- Exemplo: Local para Banner enquanto carrega -->
+        <div class="ad-placeholder" style="margin-top: 30px;">
+            [Espaço para Oferta Focada]
+            <span>Ex: "Enquanto seu vídeo baixa, ganhe R$50 de bônus na Plataforma X"</span>
         </div>
     </div>
 
@@ -270,6 +286,11 @@ function switchTab(type) {
 }
 
 async function startDownload(formatId, quality, type, label) {
+    // Exemplo do "Pop-under" invisível de Direct Link (Monetag/Adsterra)
+    // O usuário não percebe que clicou em um anúncio até ver a aba lá em cima
+    // Descomente a linha abaixo quando for para produção com seu link real de afiliação
+    // window.open('https://seu-link-de-afiliado-aqui.com', '_blank');
+
     hide('resultCard');
     show('progressCard');
     document.getElementById('progressTitle').textContent = videoData.title;
