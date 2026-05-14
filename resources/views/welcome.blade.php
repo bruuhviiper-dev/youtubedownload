@@ -35,6 +35,12 @@
             <div class="history-title">{{ app()->getLocale() === 'pt' ? 'Downloads Recentes' : 'Recent Downloads' }}</div>
             <div id="historyGrid" class="history-grid"></div>
         </div>
+
+        <!-- Banner de Exemplo: Home Hero -->
+        <div class="ad-placeholder" style="max-width: 728px; margin: 40px auto 0; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
+            <span style="display: block; margin-top: 5px;">Exemplo de Banner: Visível na Home</span>
+        </div>
     </section>
 
     <div id="resultCard" class="result-container hidden">
