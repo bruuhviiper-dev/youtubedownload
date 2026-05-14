@@ -8,12 +8,12 @@
     
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
-    <!-- SEO Hreflang Tags -->
+    
     <link rel="alternate" hreflang="x-default" href="{{ route('home') }}" />
     <link rel="alternate" hreflang="pt" href="{{ route('home.locale', ['locale' => 'pt']) }}" />
     <link rel="alternate" hreflang="en" href="{{ route('home.locale', ['locale' => 'en']) }}" />
     
-    <!-- Google Fonts: Inter -->
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<!-- Navbar -->
+
 <nav class="navbar">
     <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
         <a href="/" class="logo">
@@ -37,7 +37,7 @@
 
 <div class="container">
 
-    <!-- Hero Section -->
+    
     <section class="hero">
         <h1>{{ __('title') }}</h1>
         <p>{{ __('subtitle') }}</p>
@@ -63,14 +63,14 @@
             </div>
         </div>
 
-        <!-- History Section -->
+        
         <div id="historySection" class="history-section hidden">
             <div class="history-title">{{ app()->getLocale() === 'pt' ? 'Downloads Recentes' : 'Recent Downloads' }}</div>
             <div id="historyGrid" class="history-grid"></div>
         </div>
     </section>
 
-    <!-- Result Card -->
+    
     <div id="resultCard" class="result-container hidden">
         <div class="video-header">
             <img id="videoThumb" class="video-thumb-large" src="" alt="Thumb">
@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <!-- Progress UI -->
+    
     <div id="progressCard" class="result-container card-padded hidden">
         <h3 id="progressTitle" style="margin-bottom:20px; font-size:20px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></h3>
         
@@ -116,7 +116,7 @@
         </div>
     </div>
 
-    <!-- Complete UI -->
+    
     <div id="completeCard" class="result-container complete-card hidden">
         <div class="complete-icon-wrapper">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -128,7 +128,7 @@
         <button class="btn-reset" onclick="resetAll()">Fazer Novo Download</button>
     </div>
 
-    <!-- Features Section -->
+    
     <section class="features">
         <h2>{{ __('seo_title') }}</h2>
         <p>{{ __('seo_p1') }}</p>
@@ -157,7 +157,7 @@
         </div>
     </section>
 
-    <!-- FAQ Accordion -->
+    
     <section class="faq-section">
         <h2>{{ __('faq_title') }}</h2>
         <div class="accordion">
@@ -194,7 +194,7 @@
 
 </div>
 
-<!-- Footer -->
+
 <footer>
     <div class="container">
         <div class="footer-logo">Tube<span>Lift</span></div>

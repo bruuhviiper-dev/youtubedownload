@@ -16,44 +16,36 @@ class ProcessVideoDownload implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * The number of times the job may be attempted.
-     */
+    
     public int $tries = 2;
 
-    /**
-     * The maximum number of seconds the job can run.
-     */
+    
     public int $timeout = 600;
 
-    /**
-     * Create a new job instance.
-     */
+    
     public function __construct(
         public Download $download
     ) {}
 
-    /**
-     * Execute the job.
-     */
+    
     public function handle(YtDlpService $ytdlp): void
     {
         $download = $this->download;
 
         try {
-            // Update status to processing
+            
             $download->update([
                 'status' => 'processing',
                 'progress' => 10,
             ]);
 
-            // Build output path
+            
             $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '_', substr($download->title, 0, 50));
             $extension = $download->extension ?? 'mp4';
             $filename = $download->video_id . '_' . $safeName . '.' . $extension;
             $outputDir = storage_path('app/downloads');
 
-            // Ensure downloads directory exists
+            
             if (!is_dir($outputDir)) {
                 mkdir($outputDir, 0755, true);
             }
@@ -62,18 +54,18 @@ class ProcessVideoDownload implements ShouldQueue
 
             $download->update(['progress' => 25]);
 
-            // Determine type
+            
             $type = str_contains($download->quality ?? '', 'kbps') ? 'audio' : 'video';
 
-            // Reconstruct URL
+            
             $url = 'https://www.youtube.com/watch?v=' . $download->video_id;
 
-            // Perform download
+            
             $ytdlp->download($url, $download->format_id, $outputPath, $type);
 
             $download->update(['progress' => 80]);
 
-            // Find the actual output file (yt-dlp might change extension)
+            
             $actualFile = $this->findOutputFile($outputDir, $download->video_id);
 
             if (!$actualFile) {
@@ -82,7 +74,7 @@ class ProcessVideoDownload implements ShouldQueue
 
             $fileSize = filesize($actualFile);
 
-            // Update download record
+            
             $download->update([
                 'status' => 'completed',
                 'progress' => 100,
@@ -113,9 +105,7 @@ class ProcessVideoDownload implements ShouldQueue
         }
     }
 
-    /**
-     * Sanitize error message for the end user.
-     */
+    
     private function sanitizeErrorMessage(string $message): string
     {
         if (str_contains($message, 'SQLSTATE') || str_contains($message, 'Access denied')) {
@@ -129,9 +119,7 @@ class ProcessVideoDownload implements ShouldQueue
         return substr($message, 0, 500);
     }
 
-    /**
-     * Find the output file matching the video ID.
-     */
+    
     private function findOutputFile(string $dir, string $videoId): ?string
     {
         $files = glob($dir . DIRECTORY_SEPARATOR . $videoId . '_*');
@@ -140,15 +128,13 @@ class ProcessVideoDownload implements ShouldQueue
             return null;
         }
 
-        // Return the most recently modified file
+        
         usort($files, fn($a, $b) => filemtime($b) - filemtime($a));
 
         return $files[0];
     }
 
-    /**
-     * Handle a job failure.
-     */
+    
     public function failed(?\Throwable $exception): void
     {
         $message = $exception ? $this->sanitizeErrorMessage($exception->getMessage()) : 'Erro interno no processamento.';

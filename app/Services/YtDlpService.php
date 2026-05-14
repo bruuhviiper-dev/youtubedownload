@@ -7,29 +7,27 @@ use RuntimeException;
 
 class YtDlpService
 {
-    /**
-     * Run a yt-dlp command using shell_exec to inherit full system environment.
-     */
+    
     private function runCommand(array $args, int $timeout = 60): array
     {
-        // Escape each argument for shell
+        
         $escaped = array_map('escapeshellarg', $args);
         $command = implode(' ', $escaped);
 
-        // Use proc_open for full control
+        
         $descriptors = [
-            0 => ['pipe', 'r'],  // stdin
-            1 => ['pipe', 'w'],  // stdout
-            2 => ['pipe', 'w'],  // stderr
+            0 => ['pipe', 'r'],  
+            1 => ['pipe', 'w'],  
+            2 => ['pipe', 'w'],  
         ];
 
-        // Build environment with critical Windows variables for Python
+        
         $env = [];
-        // Copy all current environment variables
+        
         foreach (getenv() as $key => $value) {
             $env[$key] = $value;
         }
-        // Ensure critical vars are set
+        
         if (empty($env['SystemRoot'])) {
             $env['SystemRoot'] = 'C:\\Windows';
         }
@@ -50,7 +48,7 @@ class YtDlpService
             throw new RuntimeException('Falha ao iniciar processo yt-dlp.');
         }
 
-        fclose($pipes[0]); // close stdin
+        fclose($pipes[0]); 
 
         $stdout = stream_get_contents($pipes[1]);
         $stderr = stream_get_contents($pipes[2]);
@@ -66,16 +64,14 @@ class YtDlpService
         ];
     }
 
-    /**
-     * Get cookies argument if cookies.txt exists in storage/app or YT_COOKIES is set.
-     */
+    
     private function cookieArgs(): array
     {
         $cookiePath = storage_path('app/cookies.txt');
         $envCookies = env('YT_COOKIES');
 
         if ($envCookies) {
-            // Se as cookies estão no .env, garante que o arquivo existe
+            
             if (!file_exists($cookiePath) || file_get_contents($cookiePath) !== $envCookies) {
                 if (!is_dir(storage_path('app'))) {
                     mkdir(storage_path('app'), 0755, true);
@@ -91,18 +87,14 @@ class YtDlpService
         return [];
     }
 
-    /**
-     * Get ffmpeg location args if ffmpeg exists in project root.
-     */
+    
     private function ffmpegArgs(): array
     {
-        // In Railway/Linux, ffmpeg is usually in the PATH from Nixpacks
+        
         return [];
     }
 
-    /**
-     * Validate that the URL is a valid YouTube URL.
-     */
+    
     public function isValidYoutubeUrl(string $url): bool
     {
         $patterns = [
@@ -121,16 +113,14 @@ class YtDlpService
         return false;
     }
 
-    /**
-     * Get video information (metadata + formats) from YouTube.
-     */
+    
     public function getInfo(string $url): array
     {
         $isWindows = PHP_OS_FAMILY === 'Windows';
         $binaryName = $isWindows ? 'yt-dlp.exe' : 'yt-dlp';
         $binary = base_path("bin/{$binaryName}");
         
-        // Lazy Download: Se não existe ou é a versão antiga (leve), baixa a Standalone (pesada)
+        
         if (!file_exists($binary) || filesize($binary) < 1000000) {
             Log::info('Binário yt-dlp ausente ou desatualizado. Tentando download da Versão Standalone...');
             if (!is_dir(base_path('bin'))) mkdir(base_path('bin'), 0755, true);
@@ -143,7 +133,7 @@ class YtDlpService
             if (!$isWindows) shell_exec("chmod a+rx \"{$binary}\"");
         }
 
-        // Diagnóstico Profundo
+        
         Log::info('Diagnóstico yt-dlp', [
             'path' => $binary,
             'exists' => file_exists($binary),
@@ -184,9 +174,7 @@ class YtDlpService
         return $info;
     }
 
-    /**
-     * Extract and organize available formats from yt-dlp info.
-     */
+    
     public function getAvailableFormats(array $info): array
     {
         $formats = [];
@@ -210,7 +198,7 @@ class YtDlpService
             if ($vcodec === 'none' && $acodec === 'none') continue;
             if (in_array($ext, ['mhtml', 'json'])) continue;
 
-            // Audio only
+            
             if ($vcodec === 'none' && $acodec !== 'none') {
                 $abr = $fmt['abr'] ?? $tbr ?? 0;
                 $audioFormats[] = [
@@ -224,7 +212,7 @@ class YtDlpService
                 continue;
             }
 
-            // Video
+            
             if ($height) {
                 $hasAudio = $acodec !== 'none';
                 $videoFormats[] = [
@@ -240,7 +228,7 @@ class YtDlpService
             }
         }
 
-        // Sort video by height desc, deduplicate
+        
         usort($videoFormats, fn($a, $b) => $b['height'] - $a['height']);
         $seen = [];
         foreach ($videoFormats as $vf) {
@@ -248,7 +236,7 @@ class YtDlpService
         }
         $videoFormats = array_values($seen);
 
-        // Sort audio by bitrate desc, limit to 3
+        
         usort($audioFormats, fn($a, $b) => ($b['abr'] ?? 0) - ($a['abr'] ?? 0));
         if (count($audioFormats) > 3) $audioFormats = array_slice($audioFormats, 0, 3);
 
@@ -277,9 +265,7 @@ class YtDlpService
         return $formats;
     }
 
-    /**
-     * Download a video/audio with the specified format.
-     */
+    
     public function download(string $url, string $formatId, string $outputPath, string $type = 'video'): void
     {
         $hasFfmpeg = $this->checkFfmpeg();
@@ -329,9 +315,7 @@ class YtDlpService
         }
     }
 
-    /**
-     * Check if ffmpeg is available on the system.
-     */
+    
     private function checkFfmpeg(): bool
     {
         try {
@@ -342,9 +326,7 @@ class YtDlpService
         }
     }
 
-    /**
-     * Extract video metadata summary from yt-dlp info.
-     */
+    
     public function extractMetadata(array $info): array
     {
         return [

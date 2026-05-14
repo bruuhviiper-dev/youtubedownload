@@ -17,21 +17,17 @@ class DownloadController extends Controller
         private YtDlpService $ytdlp
     ) {}
 
-    /**
-     * Show the main page.
-     */
+    
     public function index()
     {
-        // Count real completed downloads and add a "base" for a more established look
+        
         $realCount = Download::where('status', 'completed')->count();
         $totalDownloads = 5420 + $realCount;
         
         return view('welcome', compact('totalDownloads'));
     }
 
-    /**
-     * Parse a YouTube URL and return video info + available formats.
-     */
+    
     public function parse(Request $request): JsonResponse
     {
         $request->validate([
@@ -40,7 +36,7 @@ class DownloadController extends Controller
 
         $url = $request->input('url');
 
-        // Validate YouTube URL
+        
         if (!$this->ytdlp->isValidYoutubeUrl($url)) {
             return response()->json([
                 'success' => false,
@@ -61,7 +57,7 @@ class DownloadController extends Controller
         } catch (\Throwable $e) {
             Log::error('Erro ao analisar URL: ' . $e->getMessage());
             
-            // Se for erro de banco de dados (ex: log), retorna mensagem limpa
+            
             if ($e instanceof QueryException) {
                 return response()->json([
                     'success' => false,
@@ -76,9 +72,7 @@ class DownloadController extends Controller
         }
     }
 
-    /**
-     * Start a download for the specified format.
-     */
+    
     public function download(Request $request): JsonResponse
     {
         $request->validate([
@@ -106,7 +100,7 @@ class DownloadController extends Controller
                 'progress' => 0,
             ]);
 
-            // Dispatch the download job
+            
             ProcessVideoDownload::dispatch($download);
 
             return response()->json([
@@ -124,9 +118,7 @@ class DownloadController extends Controller
         }
     }
 
-    /**
-     * Check the status of a download.
-     */
+    
     public function status(string $id): JsonResponse
     {
         try {
@@ -151,9 +143,7 @@ class DownloadController extends Controller
         }
     }
 
-    /**
-     * Stream the downloaded file to the user.
-     */
+    
     public function file(string $id)
     {
         try {

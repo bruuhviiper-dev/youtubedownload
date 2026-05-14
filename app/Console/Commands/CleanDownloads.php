@@ -8,19 +8,13 @@ use Illuminate\Support\Facades\Log;
 
 class CleanDownloads extends Command
 {
-    /**
-     * The name and signature of the console command.
-     */
+    
     protected $signature = 'downloads:clean {--hours=1 : Hours after which to delete files}';
 
-    /**
-     * The console command description.
-     */
+    
     protected $description = 'Clean up old downloaded files and their database records';
 
-    /**
-     * Execute the console command.
-     */
+    
     public function handle(): int
     {
         $hours = (int) $this->option('hours');
@@ -32,13 +26,13 @@ class CleanDownloads extends Command
         $deletedRecords = 0;
 
         foreach ($downloads as $download) {
-            // Delete the physical file
+            
             if ($download->file_path && file_exists($download->file_path)) {
                 unlink($download->file_path);
                 $deletedFiles++;
             }
 
-            // Delete the database record
+            
             $download->delete();
             $deletedRecords++;
         }

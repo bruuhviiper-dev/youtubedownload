@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Download extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     */
+    
     protected $fillable = [
         'video_id',
         'title',
@@ -24,9 +22,7 @@ class Download extends Model
         'error_message',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     */
+    
     protected function casts(): array
     {
         return [
@@ -36,33 +32,25 @@ class Download extends Model
         ];
     }
 
-    /**
-     * Check if the download is completed.
-     */
+    
     public function isCompleted(): bool
     {
         return $this->status === 'completed';
     }
 
-    /**
-     * Check if the download has failed.
-     */
+    
     public function isFailed(): bool
     {
         return $this->status === 'failed';
     }
 
-    /**
-     * Check if the download is in progress.
-     */
+    
     public function isProcessing(): bool
     {
         return $this->status === 'processing';
     }
 
-    /**
-     * Get formatted duration (MM:SS or HH:MM:SS).
-     */
+    
     public function getFormattedDurationAttribute(): string
     {
         if (!$this->duration) {
@@ -80,9 +68,7 @@ class Download extends Model
         return sprintf('%02d:%02d', $minutes, $seconds);
     }
 
-    /**
-     * Get formatted file size.
-     */
+    
     public function getFormattedFileSizeAttribute(): string
     {
         if (!$this->file_size) {

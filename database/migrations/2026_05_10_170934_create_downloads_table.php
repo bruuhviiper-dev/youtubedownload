@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
         Schema::create('downloads', function (Blueprint $table) {
@@ -16,22 +14,20 @@ return new class extends Migration
             $table->string('video_id')->index();
             $table->string('title');
             $table->string('thumbnail')->nullable();
-            $table->integer('duration')->nullable(); // seconds
+            $table->integer('duration')->nullable(); 
             $table->string('format_id')->nullable();
-            $table->string('quality')->nullable(); // e.g. "1080p", "720p", "audio"
+            $table->string('quality')->nullable(); 
             $table->string('extension')->default('mp4');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
-            $table->unsignedTinyInteger('progress')->default(0); // 0-100
+            $table->unsignedTinyInteger('progress')->default(0); 
             $table->string('file_path')->nullable();
-            $table->unsignedBigInteger('file_size')->nullable(); // bytes
+            $table->unsignedBigInteger('file_size')->nullable(); 
             $table->text('error_message')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         Schema::dropIfExists('downloads');
