@@ -37,9 +37,8 @@
         </div>
 
         <!-- Banner de Exemplo: Home Hero -->
-        <div class="ad-placeholder" style="max-width: 728px; margin: 40px auto 0; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
-            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
-            <span style="display: block; margin-top: 5px;">Exemplo de Banner: Visível na Home</span>
+        <div style="max-width: 728px; margin: 30px auto 0; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); line-height: 0;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: 90px; object-fit: cover; object-position: center; cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
         </div>
     </section>
 
@@ -60,9 +59,8 @@
         <div id="formatList" class="format-list-container"></div>
 
         <!-- Exemplo: Local ideal para Banner Nativo (Adsterra) -->
-        <div class="ad-placeholder" style="padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
-            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
-            <span style="margin-bottom: 10px;">Exemplo de Banner Nativo: VPN</span>
+        <div style="margin: 20px 0; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); line-height: 0;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: 90px; object-fit: cover; object-position: center; cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
         </div>
 
         <div class="security-banner">
@@ -100,9 +98,8 @@
             </div>
 
             <!-- Exemplo: Local para Banner enquanto carrega -->
-            <div class="ad-placeholder" style="margin-top: 30px; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
-                <img src="/bet_banner_mockup_1778793881798.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/bet', '_blank')">
-                <span style="margin-bottom: 10px;">Exemplo de Banner de Aposta (Bet)</span>
+            <div style="margin-top: 30px; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); line-height: 0;">
+                <img src="/bet_banner_mockup_1778793881798.png" style="width: 100%; height: 100px; object-fit: cover; object-position: center; cursor: pointer;" onclick="window.open('https://example.com/bet', '_blank')">
             </div>
         </div>
     </div>
@@ -116,9 +113,8 @@
         <a class="btn-large" id="btnSave" href="#" download>{{ __('button_download') }}</a>
         
         <!-- Exemplo: Banner Final na Conclusão -->
-        <div class="ad-placeholder" style="margin: 20px auto; max-width: 500px; padding: 0; overflow: hidden; border: none; background: transparent; min-height: auto;">
-            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: auto; border-radius: var(--radius); cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
-            <span>Ganhe 3 meses grátis de VPN ao baixar hoje!</span>
+        <div style="margin: 20px auto; max-width: 600px; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); line-height: 0;">
+            <img src="/vpn_banner_mockup_1778793810138.png" style="width: 100%; height: 90px; object-fit: cover; object-position: center; cursor: pointer;" onclick="window.open('https://example.com/vpn', '_blank')">
         </div>
 
         <br>
