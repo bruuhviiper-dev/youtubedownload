@@ -37,15 +37,15 @@
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@@context": "https://schema.org",
+      "@@type": "WebApplication",
       "name": "TubeLift",
       "url": "{{ url('/') }}",
       "description": "{{ __('subtitle') }}",
       "applicationCategory": "MultimediaApplication",
       "operatingSystem": "All",
       "offers": {
-        "@type": "Offer",
+        "@@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       }
