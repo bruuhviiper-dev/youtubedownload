@@ -1,0 +1,42 @@
+name: Refresh YouTube Cookies
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # toda segunda-feira às 6h
+  workflow_dispatch:       # permite rodar manualmente
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm install playwright
+          npx playwright install chromium --with-deps
+
+      - name: Export YouTube Cookies
+        id: export_cookies
+        run: node .github/scripts/export-cookies.js
+        env:
+          GOOGLE_EMAIL: ${{ secrets.GOOGLE_EMAIL }}
+          GOOGLE_PASSWORD: ${{ secrets.GOOGLE_PASSWORD }}
+
+      - name: Update Railway Environment Variable
+        run: |
+          COOKIES=$(cat /tmp/cookies.txt)
+          
+          curl -s -X POST https://backboard.railway.app/graphql/v2 \
+            -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"query\": \"mutation { variableUpsert(input: { projectId: \\\"${{ secrets.RAILWAY_PROJECT_ID }}\\\", serviceId: \\\"${{ secrets.RAILWAY_SERVICE_ID }}\\\", environmentId: null, name: \\\"YT_COOKIES\\\", value: $(echo \"$COOKIES\" | jq -Rs .) }) }\"
+            }"
