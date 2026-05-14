@@ -51,8 +51,8 @@ class DownloadController extends Controller
 
             return response()->json([
                 'success' => true,
-                'video' => $metadata,
-                'formats' => $formats,
+                'video' => $this->cleanUtf8($metadata),
+                'formats' => $this->cleanUtf8($formats),
             ]);
         } catch (\Throwable $e) {
             Log::error('Erro ao analisar URL: ' . $e->getMessage());
@@ -124,7 +124,7 @@ class DownloadController extends Controller
         try {
             $download = Download::findOrFail($id);
 
-            return response()->json([
+            return response()->json($this->cleanUtf8([
                 'download_id' => $download->id,
                 'status' => $download->status,
                 'progress' => $download->progress,
@@ -132,7 +132,7 @@ class DownloadController extends Controller
                 'quality' => $download->quality,
                 'file_size' => $download->formatted_file_size,
                 'error_message' => $download->error_message,
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Log::error('Erro ao verificar status: ' . $e->getMessage());
 
@@ -171,5 +171,18 @@ class DownloadController extends Controller
             Log::error('Erro ao baixar arquivo: ' . $e->getMessage());
             abort(500, 'Erro ao processar o arquivo para download.');
         }
+    }
+
+    private function cleanUtf8($data)
+    {
+        if (is_string($data)) {
+            return mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+        }
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->cleanUtf8($value);
+            }
+        }
+        return $data;
     }
 }
