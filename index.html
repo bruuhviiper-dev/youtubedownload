@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Baixe vídeos em 4K e áudio MP3 de alta fidelidade instantaneamente. O conversor de mídia mais avançado do mercado.">
+    <meta name="keywords" content="youtube downloader, download youtube video, youtube mp4, youtube mp3, baixar video youtube, youtube video downloader">
+    <title>TubeLift — Download de Vídeos do YouTube</title>
+
+    <meta property="og:title" content="TubeLift — Download de Vídeos do YouTube">
+    <meta property="og:description" content="Baixe vídeos em 4K e áudio MP3 de alta fidelidade instantaneamente.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TubeLift — Download de Vídeos do YouTube">
+    <meta name="twitter:description" content="Baixe vídeos em 4K e áudio MP3 de alta fidelidade instantaneamente.">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='25' fill='%23B00759'/%3E%3Cpath d='M50 25V60M50 60L35 45M50 60L65 45' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M30 75H70' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-hover: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        html.dark {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #2a3a4f;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --border-hover: #475569;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { background: var(--border); color: var(--text-main); }
+        .theme-toggle svg { width: 20px; height: 20px; }
+        .dark .theme-toggle .icon-moon { display: none; }
+        .dark .theme-toggle .icon-sun { display: block; }
+        html:not(.dark) .theme-toggle .icon-sun { display: none; }
+        html:not(.dark) .theme-toggle .icon-moon { display: block; }
+
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+        .navbar {
+            height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            margin-bottom: 40px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-svg { width: 36px; height: 36px; fill: var(--accent); }
+        .logo-text { font-size: 24px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent); }
+
+        .hero { text-align: center; padding: 20px 0 40px; }
+        .hero h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 800; margin-bottom: 15px; color: var(--text-main); line-height: 1.2; letter-spacing: -1px; }
+        .hero p { font-size: clamp(16px, 3vw, 18px); color: var(--text-muted); margin-bottom: 40px; }
+
+        .search-wrapper { position: relative; margin-bottom: 30px; }
+        .search-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 8px;
+            display: flex; gap: 8px;
+            box-shadow: var(--shadow-lg);
+            transition: border-color 0.3s;
+        }
+        .search-card:focus-within { border-color: var(--accent); }
+        .search-input {
+            flex: 1;
+            background: transparent; border: none; outline: none;
+            padding: 0 20px;
+            color: var(--text-main); font-size: 18px; min-width: 0;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .btn-start {
+            background: var(--accent); color: white; border: none;
+            height: 54px; padding: 0 32px;
+            border-radius: 8px; font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: background-color 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            white-space: nowrap;
+        }
+        .btn-start:hover { background: var(--accent-hover); }
+        .btn-start:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .error-msg {
+            color: var(--accent); background: rgba(239,68,68,0.1);
+            padding: 12px; border-radius: 8px; margin-top: 15px;
+            font-weight: 600; font-size: 15px;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .stats-counter { display: flex; justify-content: center; margin-bottom: 40px; }
+        .stats-badge {
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 20px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; color: var(--text-muted); font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+        .stats-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; }
+        .stats-number { color: var(--text-main); font-weight: 700; }
+
+        .history-section { margin-bottom: 60px; }
+        .history-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--text-main); text-align: left; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .history-card {
+            background: var(--bg-card); border: 1px solid var(--border); padding: 10px;
+            border-radius: var(--radius); display: flex; gap: 12px; align-items: center;
+            transition: all 0.2s; cursor: pointer; box-shadow: var(--shadow);
+            overflow: hidden; min-width: 0;
+        }
+        .history-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .history-thumb { width: 80px; height: 45px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--border); }
+        .history-info { flex: 1; min-width: 0; overflow: hidden; }
+        .history-name { font-size: 14px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .btn-history-get { font-size: 12px; font-weight: 600; color: var(--accent); background: rgba(239,68,68,0.1); padding: 6px 10px; border-radius: 4px; flex-shrink: 0; }
+
+        .result-container {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); margin-top: 20px; margin-bottom: 60px;
+            overflow: hidden; box-shadow: var(--shadow-lg);
+        }
+        .video-header {
+            padding: 24px; display: flex; gap: 24px;
+            border-bottom: 1px solid var(--border); align-items: flex-start;
+        }
+        .video-thumb-large {
+            width: 240px; aspect-ratio: 16/9; border-radius: 8px;
+            object-fit: cover; flex-shrink: 0; border: 1px solid var(--border);
+        }
+        .video-meta { flex: 1; min-width: 0; }
+        .video-meta h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); line-height: 1.3; }
+        .video-views { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+
+        .format-tabs { display: flex; gap: 10px; }
+        .format-tab {
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: all 0.2s; flex: 1; text-align: center;
+        }
+        .format-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .format-tab:hover:not(.active) { background: var(--bg-main); color: var(--text-main); }
+
+        .format-list-container { padding: 0; }
+        .format-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 24px; border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s;
+        }
+        .format-row:last-child { border-bottom: none; }
+        .format-row:hover { background: var(--bg-main); }
+        .format-info-group { display: flex; align-items: center; gap: 16px; }
+        .quality-badge { background: var(--text-main); color: var(--bg-card); padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+        .format-meta { display: flex; flex-direction: column; }
+        .format-ext { font-weight: 700; font-size: 16px; color: var(--text-main); text-transform: uppercase; }
+        .format-size { font-size: 13px; color: var(--text-muted); }
+        .btn-format { height: 40px; padding: 0 20px; font-size: 14px; border-radius: 6px; }
+
+        .security-banner {
+            padding: 20px 24px; background: var(--bg-main);
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid var(--border);
+        }
+        .security-info { display: flex; align-items: center; gap: 16px; }
+        .security-icon {
+            width: 40px; height: 40px; background: rgba(239,68,68,0.1); color: var(--accent);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .security-title { font-weight: 700; font-size: 15px; color: var(--text-main); }
+        .security-desc { font-size: 13px; color: var(--text-muted); }
+
+        .card-padded { padding: 40px; text-align: center; }
+        .progress-container { margin: 30px 0 15px; }
+        .progress-track { height: 10px; background: var(--border); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+        .progress-stats { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--text-muted); }
+
+        .complete-card { padding: 60px 40px; text-align: center; }
+        .complete-icon-wrapper {
+            width: 80px; height: 80px; background: rgba(16,185,129,0.1); color: #10b981;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .complete-title { margin-bottom: 12px; font-size: 28px; font-weight: 800; color: var(--text-main); }
+        .complete-info { color: var(--text-muted); margin-bottom: 30px; font-size: 16px; font-weight: 500; }
+        .btn-large {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 56px; padding: 0 40px; font-size: 18px; text-decoration: none;
+            border-radius: 8px; background: #10b981; color: white; font-weight: 700;
+            transition: background 0.2s;
+        }
+        .btn-large:hover { background: #059669; }
+        .btn-reset { background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 15px; font-weight: 600; margin-top: 24px; }
+        .btn-reset:hover { color: var(--text-main); }
+
+        .features { padding: 60px 0; border-top: 1px solid var(--border); text-align: center; }
+        .features h2 { font-size: 32px; font-weight: 800; margin-bottom: 16px; color: var(--text-main); }
+        .features > p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 40px; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border); padding: 30px; border-radius: var(--radius); text-align: left; box-shadow: var(--shadow); }
+        .feature-icon { color: var(--accent); margin-bottom: 20px; width: 40px; height: 40px; }
+        .feature-card h4 { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
+        .feature-card p { font-size: 15px; color: var(--text-muted); }
+
+        .faq-section { padding: 60px 0; border-top: 1px solid var(--border); }
+        .faq-section h2 { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 40px; color: var(--text-main); }
+        .accordion { display: flex; flex-direction: column; gap: 12px; }
+        .accordion-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .accordion-header { padding: 20px 24px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 16px; color: var(--text-main); background: var(--bg-main); transition: background 0.2s; }
+        .accordion-header:hover { background: var(--border); }
+        .accordion-icon { width: 16px; height: 16px; position: relative; flex-shrink: 0; }
+        .accordion-icon::before, .accordion-icon::after { content: ''; position: absolute; background: currentColor; transition: transform 0.3s; }
+        .accordion-icon::before { width: 2px; height: 100%; left: 7px; top: 0; }
+        .accordion-icon::after { width: 100%; height: 2px; left: 0; top: 7px; }
+        .accordion-item.active .accordion-icon::before { transform: rotate(90deg); }
+        .accordion-content { max-height: 0; padding: 0 24px; color: var(--text-muted); font-size: 15px; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; }
+        .accordion-item.active .accordion-content { max-height: 500px; padding: 20px 24px; border-top: 1px solid var(--border); }
+
+        .ad-placeholder { background: var(--bg-hover); border: 2px dashed var(--border); border-radius: var(--radius); padding: 15px; text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 600; margin: 20px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; }
+        .ad-placeholder span { font-size: 12px; opacity: 0.7; font-weight: 400; margin-top: 5px; color: var(--accent); }
+
+        footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; background: var(--bg-card); }
+        .footer-logo { font-size: 20px; font-weight: 800; margin-bottom: 12px; color: var(--text-main); }
+        .footer-logo span { color: var(--accent); }
+        .footer-text { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text-main); }
+
+        .hidden { display: none !important; }
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .search-card { flex-direction: column; padding: 16px; gap: 12px; border-radius: 16px; width: 100%; }
+            .search-input { padding: 12px; text-align: center; font-size: 16px; width: 100%; }
+            .btn-start { width: 100%; border-radius: 10px; }
+            .video-header { flex-direction: column; padding: 20px; text-align: center; align-items: center; }
+            .video-thumb-large { width: 100%; max-width: 320px; }
+            .format-tabs { width: 100%; }
+            .format-row { flex-direction: column; gap: 16px; text-align: center; padding: 20px; }
+            .format-info-group { flex-direction: column; gap: 8px; }
+            .btn-format { width: 100%; }
+            .security-banner { flex-direction: column; text-align: center; gap: 16px; padding: 20px; }
+            .security-info { flex-direction: column; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .history-grid { grid-template-columns: 1fr; }
+            .card-padded { padding: 30px 20px; }
+            .complete-card { padding: 40px 20px; }
+        }
+    </style>
+
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+        <a href="/" class="logo">
+            <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.582 6.186a2.506 2.506 0 0 0-1.762-1.766C18.265 4 12 4 12 4s-6.264 0-7.818.42a2.506 2.506 0 0 0-1.764 1.766C2 7.74 2 12 2 12s0 4.262.418 5.814a2.506 2.506 0 0 0 1.764 1.766C5.736 20 12 20 12 20s6.265 0 7.82-.42a2.506 2.506 0 0 0 1.762-1.766C22 16.26 22 12 22 12s0-4.26-.418-5.814zM9.995 15.25V8.75L15.67 12l-5.675 3.25z"/>
+            </svg>
+            <span class="logo-text">Tube<span>Lift</span></span>
+        </a>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar Modo Escuro">
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+    </div>
+</nav>
+
+<main>
+<div class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>TubeLift — Download de Vídeos do YouTube</h1>
+        <p>Baixe vídeos em 4K e áudio MP3 de alta fidelidade instantaneamente. O conversor de mídia mais avançado do mercado.</p>
+
+        <div class="search-wrapper">
+            <div class="search-card">
+                <input type="url" class="search-input" id="urlInput"
+                    placeholder="Cole o link do vídeo do YouTube aqui..."
+                    required autocomplete="off">
+                <button class="btn-start" id="btnParse" onclick="handleParse(event)">
+                    <span id="btnParseText">Analisar Vídeo</span>
+                    <span id="btnParseSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+            <div id="errorBox" class="error-msg hidden"></div>
+        </div>
+
+        <div class="stats-counter">
+            <div class="stats-badge">
+                <div class="stats-dot"></div>
+                <span>
+                    <span class="stats-number" id="countNum">0</span>
+                    downloads hoje
+                </span>
+            </div>
+        </div>
+
+        <div id="historySection" class="history-section hidden">
+            <div class="history-title">Downloads Recentes</div>
+            <div id="historyGrid" class="history-grid"></div>
+        </div>
+
+        <div style="max-width:728px; margin:30px auto 0; overflow:hidden; border-radius:var(--radius); border:1px solid var(--border); line-height:0;">
+            <img src="public/vpn_banner_mockup_1778793810138.png" style="width:100%; height:90px; object-fit:cover; object-position:center; cursor:pointer;" onerror="this.parentElement.style.display='none'" onclick="window.open('https://example.com/vpn','_blank')">
+        </div>
+    </section>
+
+    <!-- Result Card -->
+    <div id="resultCard" class="result-container hidden">
+        <div class="video-header">
+            <img id="videoThumb" class="video-thumb-large" src="" alt="Thumbnail">
+            <div class="video-meta">
+                <h2 id="videoTitle"></h2>
+                <div id="videoViews" class="video-views"></div>
+                <div class="format-tabs">
+                    <button class="format-tab active" data-type="video" onclick="switchTab('video')">VÍDEO MP4</button>
+                    <button class="format-tab" data-type="audio" onclick="switchTab('audio')">ÁUDIO MP3</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="formatList" class="format-list-container"></div>
+
+        <div style="margin:20px 0; overflow:hidden; border-radius:var(--radius); border:1px solid var(--border); line-height:0;">
+            <img src="public/vpn_banner_mockup_1778793810138.png" style="width:100%; height:90px; object-fit:cover; object-position:center; cursor:pointer;" onerror="this.parentElement.style.display='none'" onclick="window.open('https://example.com/vpn','_blank')">
+        </div>
+
+        <div class="security-banner">
+            <div class="security-info">
+                <div class="security-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <div class="security-title">100% Seguro &amp; Anônimo</div>
+                    <div class="security-desc">Processamento seguro e sem rastreadores.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Card -->
+    <div id="progressCard" class="result-container hidden">
+        <div class="video-header">
+            <img id="progressThumb" class="video-thumb-large" src="" alt="Thumbnail">
+            <div class="video-meta">
+                <h3 id="progressTitle" style="font-size:18px; font-weight:700; line-height:1.4; color:var(--text-main); margin:0;"></h3>
+                <div style="font-size:14px; color:var(--accent); margin-top:5px; font-weight:600;">Preparando download...</div>
+            </div>
+        </div>
+        <div class="card-padded" style="padding-top:20px;">
+            <div class="progress-container">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="progress-stats">
+                <span id="progressStatus">Iniciando...</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div style="margin-top:30px; overflow:hidden; border-radius:var(--radius); border:1px solid var(--border); line-height:0;">
+                <img src="public/bet_banner_mockup_1778793881798.png" style="width:100%; height:100px; object-fit:cover; object-position:center; cursor:pointer;" onerror="this.parentElement.style.display='none'" onclick="window.open('https://example.com/bet','_blank')">
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Card -->
+    <div id="completeCard" class="result-container complete-card hidden">
+        <div class="complete-icon-wrapper">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="complete-title">Download Pronto</h2>
+        <p id="completeInfo" class="complete-info"></p>
+        <a class="btn-large" id="btnSave" href="#" target="_blank" rel="noopener noreferrer">BAIXAR AGORA</a>
+
+        <div style="margin:20px auto; max-width:600px; overflow:hidden; border-radius:var(--radius); border:1px solid var(--border); line-height:0;">
+            <img src="public/vpn_banner_mockup_1778793810138.png" style="width:100%; height:90px; object-fit:cover; object-position:center; cursor:pointer;" onerror="this.parentElement.style.display='none'" onclick="window.open('https://example.com/vpn','_blank')">
+        </div>
+        <br>
+        <button class="btn-reset" onclick="resetAll()">Fazer Novo Download</button>
+    </div>
+
+    <!-- Features -->
+    <section class="features">
+        <h2>A Próxima Geração de Downloads</h2>
+        <p>O TubeLift não é apenas um baixador, é uma ferramenta de arquivamento de mídia de alta fidelidade, projetada para quem exige qualidade máxima.</p>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <h4>Segurança em 1º Lugar</h4>
+                <p>Nosso serviço é 100% limpo e seguro. Sem vírus, sem rastreadores e garantimos processamento anônimo.</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <h4>Alta Velocidade</h4>
+                <p>Nossos servidores processam streams de dados diretamente, garantindo que você receba o arquivo original sem perdas de compressão adicionais.</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <h4>Compatibilidade Total</h4>
+                <p>Baixe vídeos no seu PC, Mac, Android ou iOS sem precisar instalar nenhum aplicativo extra.</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <h4>Diversos Formatos</h4>
+                <p>Suporte completo para salvar vídeos em MP4 (até 4K) e extração rápida de áudio em MP3.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <h2>Perguntas Frequentes</h2>
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>O TubeLift é totalmente gratuito?</span>
+                    <div class="accordion-icon"></div>
+                </div>
+                <div class="accordion-content">Sim, o TubeLift é 100% gratuito e você pode realizar downloads ilimitados sem restrições de velocidade.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>É necessário criar uma conta?</span>
+                    <div class="accordion-icon"></div>
+                </div>
+                <div class="accordion-content">Não. Valorizamos sua privacidade. Você pode baixar qualquer mídia de forma totalmente anônima, sem cadastros.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>Quais resoluções são suportadas?</span>
+                    <div class="accordion-icon"></div>
+                </div>
+                <div class="accordion-content">Suportamos desde resoluções padrão até 4K Ultra HD para vídeos, e 320kbps para áudios MP3 de alta fidelidade.</div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>O download é rápido?</span>
+                    <div class="accordion-icon"></div>
+                </div>
+                <div class="accordion-content">Sim. Utilizamos nossa infraestrutura otimizada para processar e converter seus vídeos em questão de segundos.</div>
+            </div>
+        </div>
+    </section>
+
+</div>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-logo">Tube<span>Lift</span></div>
+        <div class="footer-text">Apenas para uso pessoal e arquivamento privado.</div>
+        <div class="footer-links">
+            <a href="#">Privacidade</a>
+            <a href="#">Termos de Uso</a>
+            <a href="#">DMCA</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+// ─── Theme ───────────────────────────────────────────────────────────────────
+function toggleTheme() {
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+    }
+}
+
+// ─── Preset formats (no server needed) ───────────────────────────────────────
+const FORMATS = {
+    video: [
+        { quality: '4K',   ext: 'mp4', cobaltQuality: '2160' },
+        { quality: '1080p', ext: 'mp4', cobaltQuality: '1080' },
+        { quality: '720p',  ext: 'mp4', cobaltQuality: '720'  },
+        { quality: '480p',  ext: 'mp4', cobaltQuality: '480'  },
+        { quality: '360p',  ext: 'mp4', cobaltQuality: '360'  },
+    ],
+    audio: [
+        { quality: 'MP3', ext: 'mp3', cobaltQuality: null },
+    ]
+};
+
+const COBALT_API    = 'https://api.cobalt.tools/';
+const BASE_DOWNLOADS = 247835;
+
+let videoData    = null;
+let progressTimer = null;
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadHistory();
+    animateCounter();
+    document.getElementById('urlInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleParse(e);
+    });
+});
+
+function animateCounter() {
+    const el = document.getElementById('countNum');
+    if (!el) return;
+    const myCount = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
+    const target  = BASE_DOWNLOADS + myCount;
+    let current   = 0;
+    const step    = target / (2000 / 30);
+    const timer   = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            el.textContent = target.toLocaleString('pt-BR');
+            clearInterval(timer);
+        } else {
+            el.textContent = Math.floor(current).toLocaleString('pt-BR');
+        }
+    }, 30);
+}
+
+// ─── Accordion ───────────────────────────────────────────────────────────────
+function toggleAccordion(header) {
+    const item     = header.parentElement;
+    const isActive = item.classList.contains('active');
+    document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('active'));
+    if (!isActive) item.classList.add('active');
+}
+
+// ─── Parse (YouTube oEmbed) ───────────────────────────────────────────────────
+function isYouTubeUrl(url) {
+    return /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/|embed\/)|youtu\.be\/)/i.test(url);
+}
+
+async function handleParse(e) {
+    if (e) e.preventDefault();
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return;
+
+    if (!isYouTubeUrl(url)) {
+        showError('Por favor, insira um link válido do YouTube.');
+        return;
+    }
+
+    showParseLoading(true);
+    hideError();
+    hide('resultCard'); hide('progressCard'); hide('completeCard');
+
+    try {
+        const oembedUrl = 'https://www.youtube.com/oembed?url=' + encodeURIComponent(url) + '&format=json';
+        const res = await fetch(oembedUrl);
+
+        if (!res.ok) {
+            showError('Não foi possível processar este vídeo. Verifique o link e tente novamente.');
+            return;
+        }
+
+        const data = await res.json();
+        videoData = {
+            url:       url,
+            title:     data.title,
+            thumbnail: data.thumbnail_url,
+            author:    data.author_name,
+        };
+
+        renderResult();
+    } catch (err) {
+        showError('Falha na conexão com o servidor.');
+    } finally {
+        showParseLoading(false);
+    }
+}
+
+function renderResult() {
+    document.getElementById('videoThumb').src = videoData.thumbnail || '';
+    document.getElementById('videoTitle').textContent = videoData.title;
+    document.getElementById('videoViews').textContent = videoData.author ? 'por ' + videoData.author : '';
+    switchTab('video');
+    show('resultCard');
+    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── Format tabs ─────────────────────────────────────────────────────────────
+function switchTab(type) {
+    document.querySelectorAll('.format-tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.type === type));
+
+    const container = document.getElementById('formatList');
+    const formats   = FORMATS[type] || [];
+
+    container.innerHTML = formats.map(f => `
+        <div class="format-row">
+            <div class="format-info-group">
+                <div class="quality-badge">${f.quality}</div>
+                <div class="format-meta">
+                    <div class="format-ext">${f.ext.toUpperCase()}</div>
+                    <div class="format-size">Tamanho Variado</div>
+                </div>
+            </div>
+            <button class="btn-start btn-format"
+                onclick="startDownload('${f.cobaltQuality}','${f.ext}','${type}','${f.quality}')">
+                BAIXAR AGORA
+            </button>
+        </div>
+    `).join('');
+}
+
+// ─── Download (Cobalt API) ────────────────────────────────────────────────────
+async function startDownload(cobaltQuality, ext, type, qualityLabel) {
+    hide('resultCard');
+    show('progressCard');
+    document.getElementById('progressTitle').textContent = videoData.title;
+    document.getElementById('progressThumb').src = videoData.thumbnail || '';
+    document.getElementById('progressPercent').textContent = '0%';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressStatus').textContent = 'Iniciando...';
+
+    // Animated progress while waiting for Cobalt
+    let pct = 0;
+    progressTimer = setInterval(() => {
+        pct = Math.min(pct + Math.random() * 9, 85);
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
+        document.getElementById('progressStatus').textContent = 'Convertendo...';
+    }, 400);
+
+    try {
+        const body = { url: videoData.url, filenameStyle: 'pretty' };
+        if (type === 'audio') {
+            body.downloadMode = 'audio';
+            body.audioFormat  = 'mp3';
+        } else {
+            body.videoQuality = cobaltQuality;
+        }
+
+        const res = await fetch(COBALT_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept':       'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        clearInterval(progressTimer);
+        progressTimer = null;
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const data = await res.json();
+        if (data.status === 'error') throw new Error(data.error?.code || 'error');
+
+        // Jump to 100%
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        document.getElementById('progressStatus').textContent = 'Download Pronto';
+
+        // Bump counter
+        const cnt = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
+        localStorage.setItem('tubelift_dl_count', cnt + 1);
+        document.getElementById('countNum').textContent =
+            (BASE_DOWNLOADS + cnt + 1).toLocaleString('pt-BR');
+
+        addToHistory({ url: videoData.url, title: videoData.title, quality: qualityLabel, thumbnail: videoData.thumbnail });
+
+        setTimeout(() => {
+            hide('progressCard');
+            document.getElementById('completeInfo').textContent =
+                videoData.title + ' • ' + qualityLabel;
+            const btnSave = document.getElementById('btnSave');
+            btnSave.href   = data.url;
+            btnSave.target = '_blank';
+            show('completeCard');
+            document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 600);
+
+    } catch (err) {
+        if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+        hide('progressCard');
+        let msg = 'Não foi possível processar este vídeo. Tente outro.';
+        if (err.message && (err.message.includes('rate') || err.message.includes('429')))
+            msg = 'Muitas requisições. Aguarde um momento e tente novamente.';
+        showError(msg);
+        show('resultCard');
+    }
+}
+
+// ─── History (localStorage) ──────────────────────────────────────────────────
+function addToHistory(item) {
+    let history = JSON.parse(localStorage.getItem('tubelift_history') || '[]');
+    history = history.filter(h => !(h.url === item.url && h.quality === item.quality));
+    history.unshift({ url: item.url, title: item.title, quality: item.quality, thumbnail: item.thumbnail || '', timestamp: Date.now() });
+    if (history.length > 6) history.pop();
+    localStorage.setItem('tubelift_history', JSON.stringify(history));
+    loadHistory();
+}
+
+function loadHistory() {
+    const history   = JSON.parse(localStorage.getItem('tubelift_history') || '[]');
+    const container = document.getElementById('historySection');
+    const grid      = document.getElementById('historyGrid');
+
+    if (history.length === 0) { container.classList.add('hidden'); return; }
+
+    container.classList.remove('hidden');
+    const BLANK_THUMB = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect fill='%23334155' width='16' height='9'/%3E%3C/svg%3E";
+    grid.innerHTML = history.map((item, i) => `
+        <div class="history-card" onclick="reparseFromHistory(${i})">
+            <img src="${escHtml(item.thumbnail)}" class="history-thumb"
+                onerror="this.src='${BLANK_THUMB}'" alt="Thumb">
+            <div class="history-info">
+                <div class="history-name">${escHtml(item.title)}</div>
+                <div class="history-meta">${escHtml(item.quality)}</div>
+            </div>
+            <div class="btn-history-get">Download</div>
+        </div>
+    `).join('');
+}
+
+function reparseFromHistory(index) {
+    const history = JSON.parse(localStorage.getItem('tubelift_history') || '[]');
+    if (!history[index]) return;
+    document.getElementById('urlInput').value = history[index].url;
+    handleParse(null);
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function resetAll() {
+    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+    document.getElementById('urlInput').value = '';
+    hide('resultCard'); hide('progressCard'); hide('completeCard');
+    hideError();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+function showError(msg) {
+    const el = document.getElementById('errorBox');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+function hideError() { document.getElementById('errorBox').classList.add('hidden'); }
+function showParseLoading(on) {
+    document.getElementById('btnParseText').classList.toggle('hidden', on);
+    document.getElementById('btnParseSpinner').classList.toggle('hidden', !on);
+    document.getElementById('btnParse').disabled = on;
+}
+function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
