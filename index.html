@@ -425,7 +425,7 @@
         </div>
         <h2 class="complete-title">Download Pronto</h2>
         <p id="completeInfo" class="complete-info"></p>
-        <a class="btn-large" id="btnSave" href="#" target="_blank" rel="noopener noreferrer">BAIXAR AGORA</a>
+        <button class="btn-large" id="btnSave" onclick="doSaveBtn()">BAIXAR AGORA</button>
 
         <div style="margin:20px auto; max-width:600px; overflow:hidden; border-radius:var(--radius); border:1px solid var(--border); line-height:0;">
             <img src="public/vpn_banner_mockup_1778793810138.png" style="width:100%; height:90px; object-fit:cover; object-position:center; cursor:pointer;" onerror="this.parentElement.style.display='none'" onclick="window.open('https://example.com/vpn','_blank')">
@@ -658,7 +658,9 @@ function switchTab(type) {
     `).join('');
 }
 
-// ─── Download (Cobalt API) ────────────────────────────────────────────────────
+// ─── Download (Cobalt API com fallback para cobalt.tools web) ────────────────
+let _dlInfo = null; // { url, ext, title, isFallback }
+
 async function startDownload(cobaltQuality, ext, type, qualityLabel) {
     hide('resultCard');
     show('progressCard');
@@ -668,7 +670,7 @@ async function startDownload(cobaltQuality, ext, type, qualityLabel) {
     document.getElementById('progressFill').style.width = '0%';
     document.getElementById('progressStatus').textContent = 'Iniciando...';
 
-    // Animated progress while waiting for Cobalt
+    // Animated progress
     let pct = 0;
     progressTimer = setInterval(() => {
         pct = Math.min(pct + Math.random() * 9, 85);
@@ -677,64 +679,104 @@ async function startDownload(cobaltQuality, ext, type, qualityLabel) {
         document.getElementById('progressStatus').textContent = 'Convertendo...';
     }, 400);
 
-    try {
-        const body = { url: videoData.url, filenameStyle: 'pretty' };
-        if (type === 'audio') {
-            body.downloadMode = 'audio';
-            body.audioFormat  = 'mp3';
-        } else {
-            body.videoQuality = cobaltQuality;
-        }
+    let downloadUrl  = null;
+    let isFallback   = false;
 
-        const res = await fetch(COBALT_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept':       'application/json'
-            },
-            body: JSON.stringify(body)
-        });
+    // Tenta instâncias públicas do Cobalt em sequência
+    const cobaltInstances = [
+        'https://api.cobalt.tools/',
+        'https://cobalt.erver.dev/',
+        'https://co.imput.net/',
+    ];
 
-        clearInterval(progressTimer);
-        progressTimer = null;
+    const body = { url: videoData.url, filenameStyle: 'pretty' };
+    if (type === 'audio') {
+        body.downloadMode = 'audio';
+        body.audioFormat  = 'mp3';
+    } else {
+        body.videoQuality = cobaltQuality;
+    }
 
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+    for (const instance of cobaltInstances) {
+        try {
+            const res = await fetch(instance, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (data.status !== 'error' && data.url) {
+                downloadUrl = data.url;
+                break;
+            }
+        } catch (_) { /* tenta próxima instância */ }
+    }
 
-        const data = await res.json();
-        if (data.status === 'error') throw new Error(data.error?.code || 'error');
+    // Fallback: cobalt.tools web interface
+    if (!downloadUrl) {
+        downloadUrl = 'https://cobalt.tools/?u=' + encodeURIComponent(videoData.url);
+        isFallback  = true;
+    }
 
-        // Jump to 100%
-        document.getElementById('progressFill').style.width = '100%';
-        document.getElementById('progressPercent').textContent = '100%';
-        document.getElementById('progressStatus').textContent = 'Download Pronto';
+    clearInterval(progressTimer);
+    progressTimer = null;
 
-        // Bump counter
-        const cnt = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
-        localStorage.setItem('tubelift_dl_count', cnt + 1);
-        document.getElementById('countNum').textContent =
-            (BASE_DOWNLOADS + cnt + 1).toLocaleString('pt-BR');
+    // Jump to 100%
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressPercent').textContent = '100%';
+    document.getElementById('progressStatus').textContent = 'Download Pronto';
 
-        addToHistory({ url: videoData.url, title: videoData.title, quality: qualityLabel, thumbnail: videoData.thumbnail });
+    // Bump counter
+    const cnt = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
+    localStorage.setItem('tubelift_dl_count', cnt + 1);
+    document.getElementById('countNum').textContent =
+        (BASE_DOWNLOADS + cnt + 1).toLocaleString('pt-BR');
 
-        setTimeout(() => {
-            hide('progressCard');
-            document.getElementById('completeInfo').textContent =
-                videoData.title + ' • ' + qualityLabel;
-            const btnSave = document.getElementById('btnSave');
-            btnSave.href   = data.url;
-            btnSave.target = '_blank';
-            show('completeCard');
-            document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 600);
+    _dlInfo = { url: downloadUrl, ext, title: videoData.title, isFallback };
+    addToHistory({ url: videoData.url, title: videoData.title, quality: qualityLabel, thumbnail: videoData.thumbnail });
 
-    } catch (err) {
-        if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+    setTimeout(() => {
         hide('progressCard');
-        let msg = 'Não foi possível processar este vídeo. Tente outro.';
-        if (err.message && (err.message.includes('rate') || err.message.includes('429')))
-            msg = 'Muitas requisições. Aguarde um momento e tente novamente.';
-        showError(msg);
-        show('resultCard');
+        document.getElementById('completeInfo').textContent = videoData.title + ' • ' + qualityLabel;
+        const btn = document.getElementById('btnSave');
+        btn.textContent       = isFallback ? 'ABRIR NO COBALT.TOOLS ↗' : 'BAIXAR AGORA';
+        btn.style.background  = isFallback ? '#6366f1' : '';
+        show('completeCard');
+        document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 600);
+}
+
+async function doSaveBtn() {
+    if (!_dlInfo) return;
+    const { url, ext, title, isFallback } = _dlInfo;
+    const btn = document.getElementById('btnSave');
+
+    // Fallback: abre cobalt.tools no browser
+    if (isFallback) { window.open(url, '_blank'); return; }
+
+    // Tenta baixar como blob (força o download mesmo que o servidor não mande Content-Disposition)
+    btn.textContent      = 'Preparando...';
+    btn.style.pointerEvents = 'none';
+    try {
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error('fetch');
+        const blob    = await res.blob();
+        const objUrl  = URL.createObjectURL(blob);
+        const safe    = title.replace(/[<>:"\/\\|?*\x00-\x1f]/g, '_').trim() || 'download';
+        const a       = document.createElement('a');
+        a.href        = objUrl;
+        a.download    = safe + '.' + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(objUrl), 60000);
+    } catch(_) {
+        // Blob falhou (CORS da CDN) — abre em nova aba; Cobalt tunnel força download pelo Content-Disposition
+        window.open(url, '_blank');
+    } finally {
+        btn.textContent      = 'BAIXAR AGORA';
+        btn.style.pointerEvents = '';
     }
 }
 
