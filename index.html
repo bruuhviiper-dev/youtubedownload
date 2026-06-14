@@ -658,9 +658,7 @@ function switchTab(type) {
     `).join('');
 }
 
-// ─── Download (Cobalt API com fallback para cobalt.tools web) ────────────────
-let _dlInfo = null; // { url, ext, title, isFallback }
-
+// ─── Download (Worker faz streaming direto do YouTube CDN) ───────────────────
 async function startDownload(cobaltQuality, ext, type, qualityLabel) {
     hide('resultCard');
     show('progressCard');
@@ -668,108 +666,83 @@ async function startDownload(cobaltQuality, ext, type, qualityLabel) {
     document.getElementById('progressThumb').src = videoData.thumbnail || '';
     document.getElementById('progressPercent').textContent = '0%';
     document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('progressStatus').textContent = 'Iniciando...';
-
-    // Animated progress
-    let pct = 0;
-    progressTimer = setInterval(() => {
-        pct = Math.min(pct + Math.random() * 9, 85);
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
-        document.getElementById('progressStatus').textContent = 'Convertendo...';
-    }, 400);
-
-    let downloadUrl  = null;
-    let isFallback   = false;
-
-    const body = { url: videoData.url, filenameStyle: 'pretty' };
-    if (type === 'audio') {
-        body.downloadMode = 'audio';
-        body.audioFormat  = 'mp3';
-    } else {
-        body.videoQuality = cobaltQuality;
-    }
+    document.getElementById('progressStatus').textContent = 'Buscando vídeo...';
 
     try {
-        const res = await fetch(COBALT_API, {
+        var reqBody = { url: videoData.url };
+        if (type === 'audio') { reqBody.downloadMode = 'audio'; }
+        else { reqBody.videoQuality = cobaltQuality; }
+
+        var res = await fetch(COBALT_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(body)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqBody)
         });
-        if (res.ok) {
-            const data = await res.json();
-            if (data.status !== 'error' && data.url) {
-                downloadUrl = data.url;
-            }
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        var ct = res.headers.get('Content-Type') || '';
+
+        // Worker retornou erro em JSON
+        if (ct.includes('application/json')) {
+            var errData = await res.json();
+            throw new Error(errData.error ? errData.error.code : 'unknown');
         }
-    } catch (_) { /* fallback abaixo */ }
 
-    // Fallback: cobalt.tools web interface
-    if (!downloadUrl) {
-        downloadUrl = 'https://cobalt.tools/?u=' + encodeURIComponent(videoData.url);
-        isFallback  = true;
-    }
+        // Worker está streamando o arquivo com progresso real
+        document.getElementById('progressStatus').textContent = 'Baixando...';
+        var total = parseInt(res.headers.get('Content-Length') || '0');
+        var disp  = res.headers.get('Content-Disposition') || '';
+        var fnm   = (disp.match(/filename="([^"]+)"/) || [])[1]
+                    || ((videoData.title || 'download').replace(/[^\w\s\-]/g, '').trim() + '.' + (type === 'audio' ? 'webm' : 'mp4'));
 
-    clearInterval(progressTimer);
-    progressTimer = null;
+        var reader = res.body.getReader();
+        var chunks = [], received = 0;
+        while (true) {
+            var chunk = await reader.read();
+            if (chunk.done) break;
+            chunks.push(chunk.value);
+            received += chunk.value.length;
+            var pct = total > 0 ? Math.min(98, received / total * 98) : Math.min(90, received / (8*1024*1024) * 90);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
+        }
 
-    // Jump to 100%
-    document.getElementById('progressFill').style.width = '100%';
-    document.getElementById('progressPercent').textContent = '100%';
-    document.getElementById('progressStatus').textContent = 'Download Pronto';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        document.getElementById('progressStatus').textContent = 'Download Pronto';
 
-    // Bump counter
-    const cnt = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
-    localStorage.setItem('tubelift_dl_count', cnt + 1);
-    document.getElementById('countNum').textContent =
-        (BASE_DOWNLOADS + cnt + 1).toLocaleString('pt-BR');
+        // Cria blob e dispara download direto
+        var blob    = new Blob(chunks, { type: ct });
+        var blobUrl = URL.createObjectURL(blob);
+        var a       = document.createElement('a');
+        a.href = blobUrl; a.download = fnm;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 60000);
 
-    _dlInfo = { url: downloadUrl, ext, title: videoData.title, isFallback };
-    addToHistory({ url: videoData.url, title: videoData.title, quality: qualityLabel, thumbnail: videoData.thumbnail });
+        var cnt = parseInt(localStorage.getItem('tubelift_dl_count') || '0');
+        localStorage.setItem('tubelift_dl_count', cnt + 1);
+        document.getElementById('countNum').textContent = (BASE_DOWNLOADS + cnt + 1).toLocaleString('pt-BR');
+        addToHistory({ url: videoData.url, title: videoData.title, quality: qualityLabel, thumbnail: videoData.thumbnail });
 
-    setTimeout(() => {
+        setTimeout(function() {
+            hide('progressCard');
+            document.getElementById('completeInfo').textContent = videoData.title + ' • ' + qualityLabel;
+            var btn = document.getElementById('btnSave');
+            btn.textContent = 'Salvo na pasta Downloads ✓';
+            btn.style.background = '#10b981';
+            show('completeCard');
+            document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 600);
+
+    } catch (err) {
         hide('progressCard');
-        document.getElementById('completeInfo').textContent = videoData.title + ' • ' + qualityLabel;
-        const btn = document.getElementById('btnSave');
-        btn.textContent       = isFallback ? 'ABRIR NO COBALT.TOOLS ↗' : 'BAIXAR AGORA';
-        btn.style.background  = isFallback ? '#6366f1' : '';
-        show('completeCard');
-        document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 600);
-}
-
-async function doSaveBtn() {
-    if (!_dlInfo) return;
-    const { url, ext, title, isFallback } = _dlInfo;
-    const btn = document.getElementById('btnSave');
-
-    // Fallback: abre cobalt.tools no browser
-    if (isFallback) { window.open(url, '_blank'); return; }
-
-    // Tenta baixar como blob (força o download mesmo que o servidor não mande Content-Disposition)
-    btn.textContent      = 'Preparando...';
-    btn.style.pointerEvents = 'none';
-    try {
-        const res  = await fetch(url);
-        if (!res.ok) throw new Error('fetch');
-        const blob    = await res.blob();
-        const objUrl  = URL.createObjectURL(blob);
-        const safe    = title.replace(/[<>:"\/\\|?*\x00-\x1f]/g, '_').trim() || 'download';
-        const a       = document.createElement('a');
-        a.href        = objUrl;
-        a.download    = safe + '.' + ext;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(objUrl), 60000);
-    } catch(_) {
-        // Blob falhou (CORS da CDN) — abre em nova aba; Cobalt tunnel força download pelo Content-Disposition
-        window.open(url, '_blank');
-    } finally {
-        btn.textContent      = 'BAIXAR AGORA';
-        btn.style.pointerEvents = '';
+        showError('Não foi possível processar este vídeo. Tente outro.');
+        show('resultCard');
     }
 }
+
+function doSaveBtn() { resetAll(); }
 
 // ─── History (localStorage) ──────────────────────────────────────────────────
 function addToHistory(item) {
