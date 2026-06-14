@@ -539,7 +539,7 @@ const FORMATS = {
     ]
 };
 
-const COBALT_API    = 'https://api.cobalt.tools/';
+const COBALT_API     = 'https://twilight-leaf-4982.bruuhviiper.workers.dev/';
 const BASE_DOWNLOADS = 247835;
 
 let videoData    = null;
@@ -682,13 +682,6 @@ async function startDownload(cobaltQuality, ext, type, qualityLabel) {
     let downloadUrl  = null;
     let isFallback   = false;
 
-    // Tenta instâncias públicas do Cobalt em sequência
-    const cobaltInstances = [
-        'https://api.cobalt.tools/',
-        'https://cobalt.erver.dev/',
-        'https://co.imput.net/',
-    ];
-
     const body = { url: videoData.url, filenameStyle: 'pretty' };
     if (type === 'audio') {
         body.downloadMode = 'audio';
@@ -697,21 +690,19 @@ async function startDownload(cobaltQuality, ext, type, qualityLabel) {
         body.videoQuality = cobaltQuality;
     }
 
-    for (const instance of cobaltInstances) {
-        try {
-            const res = await fetch(instance, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            if (!res.ok) continue;
+    try {
+        const res = await fetch(COBALT_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (res.ok) {
             const data = await res.json();
             if (data.status !== 'error' && data.url) {
                 downloadUrl = data.url;
-                break;
             }
-        } catch (_) { /* tenta próxima instância */ }
-    }
+        }
+    } catch (_) { /* fallback abaixo */ }
 
     // Fallback: cobalt.tools web interface
     if (!downloadUrl) {
